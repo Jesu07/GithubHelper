@@ -1,0 +1,13 @@
+# Github Actions helper - Local Properties
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Github Helper
+
+app:
+  github:
+    baseUrl: https://api.github.com
+    apiVersion: 2022-11-28
