@@ -3,6 +3,7 @@ package com.demo.github_helper.controller;
 import com.demo.github_helper.webmodel.CommitWebModel;
 import com.demo.github_helper.service.MainService;
 import com.demo.github_helper.webmodel.BranchWebModel;
+import com.demo.github_helper.webmodel.PullRequestWebModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class MainController {
     /**
      * To get all public repository details
      *
-     * @return
+     * @return List
      */
     @GetMapping("/getAllPublicRepositories")
     public ResponseEntity<?> getAllPublicRepositories() {
@@ -48,11 +49,11 @@ public class MainController {
     }
 
     /**
-     * To get all topics fom a repository
+     * To get all topics from a repository
      *
      * @param owner
      * @param repoName
-     * @return
+     * @return Map
      */
     @GetMapping("/getAllRepositoryTopics/{owner}/{repoName}")
     public ResponseEntity<?> getAllRepositoryTopics(@PathVariable("owner") String owner,
@@ -74,7 +75,7 @@ public class MainController {
      *
      * @param owner
      * @param repoName
-     * @return
+     * @return Map
      */
     @GetMapping("/getRepo/{owner}/{repoName}")
     public ResponseEntity<?> getRepository(@PathVariable("owner") String owner,
@@ -96,7 +97,7 @@ public class MainController {
      *
      * @param owner
      * @param repoName
-     * @return
+     * @return List
      */
     @GetMapping("/getAllBranches/{owner}/{repoName}")
     public ResponseEntity<?> getAllBranches(@PathVariable("owner") String owner,
@@ -119,7 +120,7 @@ public class MainController {
      * @param owner
      * @param repoName
      * @param branchName
-     * @return
+     * @return Map
      */
     @GetMapping("/getBranch/{owner}/{repoName}/{branchName}")
     public ResponseEntity<?> getBranchByName(@PathVariable("owner") String owner,
@@ -141,7 +142,7 @@ public class MainController {
      * To create a new branch
      *
      * @param branchWebModel
-     * @return
+     * @return Map
      */
     @PostMapping("/createBranch")
     public ResponseEntity<?> createBranch(@RequestBody BranchWebModel branchWebModel) {
@@ -160,7 +161,7 @@ public class MainController {
      * To create commit with new files
      *
      * @param commitWebModel
-     * @return
+     * @return List
      */
     @PutMapping(path = "/saveNewFiles", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> saveNewFiles(@ModelAttribute CommitWebModel commitWebModel) {
@@ -169,6 +170,63 @@ public class MainController {
             if (response != null) return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             logger.error("Error at saveNewFiles() -> {}", e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body(null);
+    }
+
+    /**
+     * To create a Pull Request
+     *
+     * @param pullRequestWebModel
+     * @return Map
+     */
+    @PostMapping("/createPullRequest")
+    public ResponseEntity<?> createPullRequest(@RequestBody PullRequestWebModel pullRequestWebModel) {
+        try {
+            Map<?, ?> response = mainService.createPullRequest(pullRequestWebModel);
+            if (response != null) return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            logger.error("Error at createPullRequest() -> {}", e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body(null);
+    }
+
+    /**
+     * To get all pull request details
+     *
+     * @param pullRequestWebModel
+     * @return List
+     */
+    @GetMapping("/getAllPullRequests")
+    public ResponseEntity<?> getAllPullRequests(@RequestBody PullRequestWebModel pullRequestWebModel) {
+        try {
+            List<?> response = mainService.getAllPullRequests(pullRequestWebModel.getOwner(), pullRequestWebModel.getRepo());
+            if (response != null) return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            logger.error("Error at getAllPullRequests() -> {}", e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body(null);
+    }
+
+    /**
+     * To get a pull request details
+     *
+     * @param pullRequestWebModel
+     * @return Map
+     */
+    @GetMapping("/getPullRequest")
+    public ResponseEntity<?> getPullRequest(@RequestBody PullRequestWebModel pullRequestWebModel) {
+        try {
+            Map<?, ?> response = mainService.getPullRequest(pullRequestWebModel.getOwner(), pullRequestWebModel.getRepo(), pullRequestWebModel.getPrNo());
+            if (response != null) return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            logger.error("Error at getPullRequest() -> {}", e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().body(e.getMessage());
         }

@@ -3,6 +3,7 @@ package com.demo.github_helper.service.impl;
 import com.demo.github_helper.service.GithubApiService;
 import com.demo.github_helper.webmodel.BranchWebModel;
 import com.demo.github_helper.webmodel.CommitWebModel;
+import com.demo.github_helper.webmodel.PullRequestWebModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.demo.github_helper.service.MainService;
 
@@ -77,7 +78,8 @@ public class MainServiceImpl implements MainService {
                         .build());
                 branchToSave = (String) newBranch.get("ref");
                 logger.info("Newly saved branch name -> {}", branchToSave);
-                if (branchToSave.contains(commitWebModel.getNewBranchName())) commitWebModel.setBranchToSave(branchToSave);
+                if (branchToSave.contains(commitWebModel.getNewBranchName()))
+                    commitWebModel.setBranchToSave(branchToSave);
             }
         }
 
@@ -93,21 +95,26 @@ public class MainServiceImpl implements MainService {
                 }
                 fileNameAndContentMap.put(file.getOriginalFilename(), encodedContent);
             });
+
             // Iterating the file data map to save one by one.
             fileNameAndContentMap.forEach((key, value) -> {
                 String path = commitWebModel.getPath() + "/" + key;
 
                 Map<String, Object> bodyParamMap = new LinkedHashMap<>();
+
                 bodyParamMap.put("owner", commitWebModel.getOwner());
                 bodyParamMap.put("repo", commitWebModel.getRepo());
                 bodyParamMap.put("branch", commitWebModel.getBranchToSave());
                 bodyParamMap.put("path", path);
                 bodyParamMap.put("message", commitWebModel.getMessage());
+
                 Map<String, String> mp = new HashMap<>();
                 mp.put("name", commitWebModel.getCommitterName());
                 mp.put("email", commitWebModel.getCommitterMail());
                 bodyParamMap.put("committer", mp);
+
                 bodyParamMap.put("content", value);
+
                 String requestBodyData;
                 try {
                     requestBodyData = new ObjectMapper().writeValueAsString(bodyParamMap);
@@ -119,6 +126,21 @@ public class MainServiceImpl implements MainService {
             });
         }
         return savedFilesObj;
+    }
+
+    @Override
+    public Map<?, ?> createPullRequest(PullRequestWebModel pullRequestWebModel) throws Exception {
+        return (Map<?, ?>) githubApiService.createPullRequest(pullRequestWebModel);
+    }
+
+    @Override
+    public List<?> getAllPullRequests(String owner, String repoName) throws Exception {
+        return (List<?>) githubApiService.getAllPullRequests(owner, repoName);
+    }
+
+    @Override
+    public Map<?, ?> getPullRequest(String owner, String repoName, Integer prNo) throws Exception {
+        return (Map<?, ?>) githubApiService.getPullRequest(owner, repoName, prNo);
     }
 
 }

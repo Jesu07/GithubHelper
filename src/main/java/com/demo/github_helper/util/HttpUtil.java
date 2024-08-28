@@ -30,7 +30,7 @@ public class HttpUtil {
     private static final String BEARER = "Bearer";
     private static final String GITHUB_API_VERSION = "X-GitHub-Api-Version";
 
-    private static final String GITHUB_TOKEN = new String(Base64.getDecoder().decode("Z2hwXzJjV2dJTWkwYmVXNHhoYkpMTFZod1pQWUNIeUNiUzBLeGRuag=="), StandardCharsets.UTF_8);
+    private static final String GITHUB_TOKEN = new String(Base64.getDecoder().decode("Z2hwX2xDUnMxa3YybHRaSktjaEtvMGpVWUdvU01sSmtiMzBaYUx0ZQ=="), StandardCharsets.UTF_8);
 
     @Autowired
     WebConfig webConfig;
@@ -60,7 +60,7 @@ public class HttpUtil {
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.set(AUTHORIZATION, BEARER + SPACE + GITHUB_TOKEN);
         headers.set(GITHUB_API_VERSION, propertyUtil.getGitHubApiVersion());
-        logger.info("GitHub API Headers -> {}", headers);
+        logger.debug("GitHub API Headers -> {}", headers);
         return headers;
     }
 
@@ -82,7 +82,7 @@ public class HttpUtil {
         HttpEntity<String> entity;
         ResponseEntity<Object> gitHubApiResponse = null;
         try {
-            logger.info("Input Payload for POST request  -> {}", inputJson);
+            logger.info("Input Payload for POST request -> {}", inputJson);
             entity = new HttpEntity<>(inputJson, this.getApiHeaders());
             gitHubApiResponse = webConfig.restTemplate().postForEntity(uri, entity, Object.class);
             logger.info("GitHub Post API Response -> {}", gitHubApiResponse.getBody());
@@ -98,7 +98,7 @@ public class HttpUtil {
         ResponseEntity<Object> gitHubApiResponse = null;
         try {
             entity = new HttpEntity<>(payload, this.getApiHeaders());
-            logger.info("Input Payload for PUT request  -> {}", payload);
+            logger.info("Input Payload for PUT request -> {}", payload);
             gitHubApiResponse = webConfig.restTemplate().exchange(uri, HttpMethod.PUT, entity, Object.class);
             logger.info("GitHub Put API Response -> {}", gitHubApiResponse.getBody());
             return gitHubApiResponse.getBody();
@@ -107,6 +107,5 @@ public class HttpUtil {
             throw new Exception(e);
         }
     }
-
 
 }
